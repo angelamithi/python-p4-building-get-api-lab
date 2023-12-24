@@ -20,7 +20,19 @@ def index():
 
 @app.route('/bakeries')
 def bakeries():
-    return ''
+    bakeries=[]
+    for bakery in Bakery.query.all():
+        bakery_dict={
+            "id":bakery.id,
+            "name":bakery.name,
+            "created_at":bakery.created_at,
+            "updated_at":bakery.updated_at,
+            "baked_goods":bakery.baked_goods
+
+        }
+        bakeries.append(bakery_dict)
+    response=make_response(bakeries,200,{"Content-Type": "application/json"})
+    return response
 
 @app.route('/bakeries/<int:id>')
 def bakery_by_id(id):
