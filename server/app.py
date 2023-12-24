@@ -2,6 +2,7 @@
 
 from flask import Flask, make_response, jsonify
 from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 
 from models import db, Bakery, BakedGood
 
@@ -27,7 +28,7 @@ def bakeries():
             "name":bakery.name,
             "created_at":bakery.created_at,
             "updated_at":bakery.updated_at,
-            "baked_goods":bakery.baked_goods
+           # "baked_goods":bakery.baked_goods
 
         }
         bakeries.append(bakery_dict)
@@ -36,15 +37,32 @@ def bakeries():
 
 @app.route('/bakeries/<int:id>')
 def bakery_by_id(id):
-    return ''
+    single_bakery=Bakery.query.filter(Bakery.id==id).first()
+    single_bakery_dict=single_bakery.to_dict()
+    response=make_response(single_bakery_dict,200)
+    return response
 
 @app.route('/baked_goods/by_price')
 def baked_goods_by_price():
-    return ''
+    baked_goods_list=[]
+    for baked_item in BakedGood.query.order_by(BakedGood.price.desc()).all():
+        baked_goods_dict={
+            "id":baked_item.id,
+            "name":baked_item.name,
+            "price":baked_item.price,
+            "created_at":baked_item.created_at,
+            "updated_at":baked_item.updated_at,
+        }
+        baked_goods_list.append(baked_goods_dict)
+    response=make_response(baked_goods_list,200)
+    return response
 
 @app.route('/baked_goods/most_expensive')
 def most_expensive_baked_good():
-    return ''
+    expensive_good=BakedGood.query.order_by(BakedGood.price.desc()).first()
+    expensive_good_dict=expensive_good.to_dict()
+    response=make_response(expensive_good_dict,200)
+    return response
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
